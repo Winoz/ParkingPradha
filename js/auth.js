@@ -71,7 +71,7 @@ const Auth = {
 
   async doLogin() {
     const phone = document.getElementById('loginPhone').value.trim();
-    const password = document.getElementById('loginPassword').value;
+    const password = document.getElementById('loginPassword').value.trim();
     const btn = document.getElementById('btnLogin');
 
     if (!phone || !password) {
@@ -154,4 +154,5 @@ const Auth = {
     App.navigate('home');
     App.toast('Anda telah keluar.', 'info');
   }
+
 };
