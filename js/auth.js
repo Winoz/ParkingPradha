@@ -1,5 +1,5 @@
 /* ==========================================
-   AUTHENTICATION MODULE
+   AUTHENTICATION MODULE (LENGKAP)
    ========================================== */
 
 const Auth = {
@@ -47,14 +47,6 @@ const Auth = {
           <input type="text" id="regBlok" class="input" placeholder="Contoh: A-12" />
         </div>
         <div class="form-group">
-          <label>Merk Kendaraan</label>
-          <input type="text" id="regMerk" class="input" placeholder="Contoh: Toyota Avanza" />
-        </div>
-        <div class="form-group">
-          <label>Plat Nomor</label>
-          <input type="text" id="regPlat" class="input" placeholder="Contoh: D 1234 AB" />
-        </div>
-        <div class="form-group">
           <label>Password</label>
           <input type="password" id="regPassword" class="input" placeholder="Minimal 6 karakter" />
           <div class="hint">Password digunakan untuk login ke dashboard Anda.</div>
@@ -69,90 +61,114 @@ const Auth = {
     App.openModal(html);
   },
 
+  // ✅ FUNGSI LOGIN - PERBAIKAN LENGKAP
   async doLogin() {
-    const phone = document.getElementById('loginPhone').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
-    const btn = document.getElementById('btnLogin');
+    const phone = document.getElementById('loginPhone')?.value?.trim() || '';
+    const password = document.getElementById('loginPassword')?.value?.trim() || '';
 
     if (!phone || !password) {
-      App.toast('Harap isi semua field.', 'warning');
+      App.toast('Nomor HP dan Password tidak boleh kosong', 'error');
       return;
     }
 
-    btn.disabled = true;
-    btn.textContent = 'Memproses...';
+    const btnLogin = document.getElementById('btnLogin');
+    const originalText = btnLogin.textContent;
+    btnLogin.disabled = true;
+    btnLogin.textContent = 'Memproses...';
 
     try {
-      const result = await API.post('loginUser', { no_hp: phone, password });
-      Utils.setSession(result.user);
-      App.closeModal();
-      App.updateNavbar();
-      App.toast('Login berhasil! Selamat datang, ' + result.user.nama, 'success');
-
-      if (result.user.role === 'Admin') {
-        App.navigate('admin');
-      } else {
-        App.navigate('dashboard');
-      }
-    } catch (error) {
-      App.toast(error.message, 'error');
-      btn.disabled = false;
-      btn.textContent = 'Masuk';
-    }
-  },
-
-  async doRegister() {
-    const nama = document.getElementById('regName').value.trim();
-    const no_hp = document.getElementById('regPhone').value.trim();
-    const blok_rumah = document.getElementById('regBlok').value.trim();
-    const merk = document.getElementById('regMerk').value.trim();
-    const plat = document.getElementById('regPlat').value.trim();
-    const password = document.getElementById('regPassword').value;
-    const btn = document.getElementById('btnRegister');
-
-    if (!nama || !no_hp || !blok_rumah || !merk || !plat || !password) {
-      App.toast('Harap isi semua field.', 'warning');
-      return;
-    }
-    if (password.length < 6) {
-      App.toast('Password minimal 6 karakter.', 'warning');
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Mendaftar...';
-
-    try {
-      const result = await API.post('registerUser', {
-        nama, no_hp, blok_rumah, password
+      const response = await API.post('loginUser', {
+        no_hp: phone,
+        password: password
       });
 
-      App.toast(result.message, 'success');
-      // Auto login after register
-      const loginResult = await API.post('loginUser', { no_hp, password });
-      Utils.setSession(loginResult.user);
+      // Simpan session
+      Utils.setSession(response.user);
+
+      // Tampilkan sukses
+      App.toast('Login berhasil! Selamat datang ' + response.user.nama, 'success');
+
+      // Close modal
       App.closeModal();
+
+      // Update navbar
       App.updateNavbar();
-      App.navigate('dashboard');
+
+      // Redirect ke home
+      App.navigate('home');
+
     } catch (error) {
-      App.toast(error.message, 'error');
-      btn.disabled = false;
-      btn.textContent = 'Daftar Sekarang';
+      App.toast('❌ ' + error.message, 'error');
+    } finally {
+      btnLogin.disabled = false;
+      btnLogin.textContent = originalText;
     }
   },
 
-  forgotPassword() {
-    App.closeModal();
-    // Default admin contact
-    const msg = encodeURIComponent('Halo admin, saya lupa password akun parkir saya. Mohon bantuan untuk reset password.');
-    window.open(`https://wa.me/6281320912117?text=${msg}`, '_blank');
+  // ✅ FUNGSI REGISTER - PERBAIKAN LENGKAP
+  async doRegister() {
+    const name = document.getElementById('regName')?.value?.trim() || '';
+    const phone = document.getElementById('regPhone')?.value?.trim() || '';
+    const blok = document.getElementById('regBlok')?.value?.trim() || '';
+    const password = document.getElementById('regPassword')?.value?.trim() || '';
+
+    // Validasi
+    if (!name || !phone || !blok || !password) {
+      App.toast('Semua field harus diisi', 'error');
+      return;
+    }
+
+    if (password.length < 6) {
+      App.toast('Password minimal 6 karakter', 'error');
+      return;
+    }
+
+    if (!/^08\d{8,}$/.test(phone)) {
+      App.toast('Format nomor HP harus diawali 08 dan minimal 10 digit', 'error');
+      return;
+    }
+
+    const btnRegister = document.getElementById('btnRegister');
+    const originalText = btnRegister.textContent;
+    btnRegister.disabled = true;
+    btnRegister.textContent = 'Mendaftar...';
+
+    try {
+      const response = await API.post('registerUser', {
+        nama: name,
+        no_hp: phone,
+        blok_rumah: blok,
+        password: password
+      });
+
+      App.toast('✅ Registrasi berhasil! Silakan login', 'success');
+
+      // Close modal dan buka login
+      App.closeModal();
+      setTimeout(() => {
+        Auth.showLoginModal();
+      }, 500);
+
+    } catch (error) {
+      App.toast('❌ ' + error.message, 'error');
+    } finally {
+      btnRegister.disabled = false;
+      btnRegister.textContent = originalText;
+    }
   },
 
+  // ✅ FUNGSI LOGOUT
   logout() {
-    Utils.clearSession();
-    App.updateNavbar();
-    App.navigate('home');
-    App.toast('Anda telah keluar.', 'info');
-  }
+    if (confirm('Apakah Anda yakin ingin keluar?')) {
+      Utils.clearSession();
+      App.updateNavbar();
+      App.navigate('home');
+      App.toast('Anda telah keluar', 'info');
+    }
+  },
 
+  // Optional: Forgot Password (dummy function)
+  forgotPassword() {
+    App.toast('Hubungi admin untuk reset password', 'info');
+  }
 };
