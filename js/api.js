@@ -4,7 +4,7 @@
 
 const API = {
   // ⚠️ GANTI URL INI dengan URL deployment Google Apps Script Anda
-  BASE_URL: 'https://script.google.com/macros/s/AKfycbxOSTOm_RNjFMe2iymXTvQ-lB1iizUT1hB1nJXYq4346ai5AMOEh5dnxfKcn3Ayg0f3/exec,
+  BASE_URL: 'https://script.google.com/macros/s/AKfycbxOSTOm_RNjFMe2iymXTvQ-lB1iizUT1hB1nJXYq4346ai5AMOEh5dnxfKcn3Ayg0f3/exec',
 
   // Cache
   _cache: {},
@@ -38,6 +38,7 @@ const API = {
       const response = await fetch(this.BASE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
+        redirect: 'follow', // WAJIB ada untuk mengatasi CORS Google Apps Script
         body: JSON.stringify({ action, data })
       });
       const result = await response.json();
@@ -56,4 +57,5 @@ const API = {
   clearCache() {
     this._cache = {};
   }
+
 };
