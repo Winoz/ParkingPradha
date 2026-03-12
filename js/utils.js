@@ -121,4 +121,14 @@ const Utils = {
       timer = setTimeout(() => fn.apply(this, args), delay);
     };
   }
+  // Tambahkan di bagian akhir sebelum closing brace
+  statusBadge(status) {
+    const statusMap = {
+      'Active': { color: 'var(--success)', text: '✓ Aktif' },
+      'Pending': { color: 'var(--warning)', text: '⏳ Menunggu' },
+      'Rejected': { color: 'var(--danger)', text: '✗ Ditolak' }
+    };
+    const s = statusMap[status] || { color: '#999', text: status };
+    return `<span style="display:inline-block;padding:4px 8px;background:${s.color}20;color:${s.color};border-radius:4px;font-size:.75rem;font-weight:600;">${s.text}</span>`;
+  }
 };
