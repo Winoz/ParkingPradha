@@ -4,7 +4,7 @@
 
 const API = {
   // ⚠️ GANTI URL INI dengan URL deployment Google Apps Script Anda
-  BASE_URL: 'https://script.google.com/macros/s/AKfycbxbdCYhMSwanysJMDU_hM1GIxQplcwONLWXvpOJrYERVkj8cW2-SBZLzfFK32xSup4t/exec',
+  BASE_URL: 'https://script.google.com/macros/s/AKfycbyDqQTtN-tzqAQzeB76Nv0dOOC660C_D6ewB3cz5PyKPKx8f5tn0PgT-B6bPwefj0Pm/exec',
 
   // Cache
   _cache: {},
@@ -59,5 +59,6 @@ const API = {
   }
 
 };
+
 
 
